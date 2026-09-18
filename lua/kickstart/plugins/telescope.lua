@@ -40,11 +40,28 @@ require('telescope').setup {
   -- You can put your default mappings / updates / etc. in here
   --  All the info you're looking for is in `:help telescope.setup()`
   --
-  -- defaults = {
-  --   mappings = {
-  --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-  --   },
-  -- },
+  defaults = {
+    -- This config is symlinked from ~/dotfiles, so tell ripgrep to follow
+    -- symlinks or every search only sees nvim-pack-lock.json.
+    vimgrep_arguments = {
+      'rg',
+      '--color=never',
+      '--no-heading',
+      '--with-filename',
+      '--line-number',
+      '--column',
+      '--smart-case',
+      '--follow',
+    },
+    -- Cycle through previous search prompts (e.g. 'foo', 'bar', ...)
+    history = { cycle_wrap = true },
+    mappings = {
+      i = {
+        ['<C-Up>'] = require('telescope.actions').cycle_history_prev,
+        ['<C-Down>'] = require('telescope.actions').cycle_history_next,
+      },
+    },
+  },
   -- pickers = {}
   extensions = {
     ['ui-select'] = { require('telescope.themes').get_dropdown() },
@@ -59,7 +76,9 @@ pcall(require('telescope').load_extension, 'ui-select')
 local builtin = require 'telescope.builtin'
 vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
 vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+vim.keymap.set('n', '<leader>sf', function()
+  builtin.find_files { find_command = { 'rg', '--files', '--color=never', '--follow' } }
+end, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
 vim.keymap.set({ 'n', 'v' }, '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
 vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
@@ -128,5 +147,12 @@ vim.keymap.set(
 
 -- Shortcut for searching your Neovim configuration files
 vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config', follow = true } end, { desc = '[S]earch [N]eovim files' })
+
+-- Shortcut for searching your Hyprland configuration files
+vim.keymap.set('n', '<leader>sh', function() builtin.find_files { cwd = vim.fn.expand '~/.config/hypr', follow = true } end, { desc = '[S]earch [H]yprland files' })
+
+-- Shortcut for searching your Omarchy configuration files
+vim.keymap.set('n', '<leader>so', function() builtin.find_files { cwd = vim.fn.expand '~/.config/omarchy', follow = true } end, { desc = '[S]earch [O]omarchy files' })
+
 
 -- vim: ts=2 sts=2 sw=2 et

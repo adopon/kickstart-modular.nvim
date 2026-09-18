@@ -112,9 +112,11 @@ local servers = {
   --    https://github.com/pmizio/typescript-tools.nvim
   --
   -- But for many setups, the LSP (`ts_ls`) will work just fine
-  -- ts_ls = {},
+  ts_ls = {},
+  svelte = {},
 
   stylua = {}, -- Used to format Lua code
+  pylsp = {},  -- Python LSP
 
   -- Special Lua Config, as recommended by neovim help docs
   lua_ls = {

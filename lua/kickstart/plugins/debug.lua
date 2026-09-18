@@ -85,6 +85,25 @@ dap.listeners.after.event_initialized['dapui_config'] = dapui.open
 dap.listeners.before.event_terminated['dapui_config'] = dapui.close
 dap.listeners.before.event_exited['dapui_config'] = dapui.close
 
+dap.adapters.python = {
+  type = 'executable',
+  command = 'python3',
+  args = { '-m', 'debugpy.adapter' },
+}
+
+dap.configurations.python = {
+  {
+    type = 'python',
+    request = 'launch',
+    name = 'Launch file',
+    program = '${file}',
+    args = function()
+      local s = vim.fn.input 'Args: '
+      return vim.fn.split(s, '\\s\\+')
+    end,
+  },
+}
+
 -- Install golang specific config
 require('dap-go').setup {
   delve = {
