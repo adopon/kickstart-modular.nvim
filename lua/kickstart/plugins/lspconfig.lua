@@ -124,6 +124,27 @@ local servers = {
   stylua = {}, -- Used to format Lua code
   pylsp = {},  -- Python LSP
 
+  -- Ansible. Neovim has no built-in Ansible filetype detection, and lspconfig's
+  -- default is filetypes = { 'yaml.ansible' } with root_markers = {
+  -- 'ansible.cfg', '.ansible-lint' } — so it never attaches to a normal .yml.
+  -- We broaden filetypes to plain `yaml`; the root_markers still gate it to
+  -- actual Ansible projects (drop an `.ansible-lint` or `ansible.cfg` at the root).
+  ansiblels = {
+    filetypes = { 'yaml', 'yaml.ansible' },
+    root_markers = { '.ansible-lint', 'ansible.cfg', 'galaxy.yml', 'requirements.yml' },
+    settings = {
+      ansible = {
+        ansible = { path = 'ansible' },
+        python = { interpreterPath = 'python3' },
+        executionEnvironment = { enabled = false },
+        validation = {
+          enabled = true,
+          lint = { enabled = true, path = 'ansible-lint' },
+        },
+      },
+    },
+  },
+
   -- Special Lua Config, as recommended by neovim help docs
   lua_ls = {
     on_init = function(client)
