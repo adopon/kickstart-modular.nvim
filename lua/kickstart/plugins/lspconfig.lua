@@ -122,13 +122,12 @@ local servers = {
   svelte = {},
 
   stylua = {}, -- Used to format Lua code
-  pylsp = {},  -- Python LSP
+  pylsp = {}, -- Python LSP
 
-  -- Ansible. Neovim has no built-in Ansible filetype detection, and lspconfig's
-  -- default is filetypes = { 'yaml.ansible' } with root_markers = {
-  -- 'ansible.cfg', '.ansible-lint' } — so it never attaches to a normal .yml.
-  -- We broaden filetypes to plain `yaml`; the root_markers still gate it to
-  -- actual Ansible projects (drop an `.ansible-lint` or `ansible.cfg` at the root).
+  -- Ansible. `custom.plugins.ansible` detects playbooks, role files,
+  -- group_vars/host_vars, inventories, etc. and sets filetype `yaml.ansible`;
+  -- plain `yaml` stays enabled as a fallback for new files or unusual layouts.
+  -- The root_markers below still gate the server to actual Ansible projects.
   ansiblels = {
     filetypes = { 'yaml', 'yaml.ansible' },
     root_markers = { '.ansible-lint', 'ansible.cfg', 'galaxy.yml', 'requirements.yml' },
@@ -142,6 +141,21 @@ local servers = {
           lint = { enabled = true, path = 'ansible-lint' },
         },
       },
+    },
+  },
+
+  -- Jinja template server. It cannot know Ansible variables, so
+  -- `hide_undefined` is set via init_options (settings/didChangeConfiguration
+  -- arrives too late for its initial scan). `templates` is relative to the
+  -- project root; adjust it for repos that keep templates elsewhere.
+  jinja_lsp = {
+    filetypes = { 'jinja', 'jinja.bash', 'jinja.json', 'jinja.ini', 'jinja.yaml', 'jinja.xml', 'jinja.html' },
+    root_markers = { '.git', 'ansible.cfg', '.ansible-lint', 'galaxy.yml' },
+    init_options = {
+      hide_undefined = true,
+      templates = 'roles',
+      backend = {},
+      lang = 'python',
     },
   },
 
